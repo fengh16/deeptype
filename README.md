@@ -3,17 +3,37 @@
 DeepType: Multilingual Entity Linking through Neural Type System Evolution
 --------------------------------------------------------------------------
 
+需要先做后面的install部分，Cython版本不能过高，`pip install Cython==0.27.2 --install-option="--no-cython-compile"`
+
+- 相关issue：https://github.com/openai/deeptype/issues/38
+
+旧版本的Cython和高版本的python3放在一起会有问题，因为Python3.7里面会有await关键字，但是旧版本Cython里面用了await作为变量名……所以不用0.26版本的cython
+
+- Python 3.7 introduced a change which made async a reserved keyword
+
+``` python
+(venv) dell@dell-PowerEdge-T640:~/fh/deeptype/deeptype$ python
+Python 3.7.4 (default, Aug 13 2019, 20:35:49) 
+[GCC 7.3.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> await = None
+  File "<stdin>", line 1
+    await = None
+          ^
+SyntaxError: invalid syntax
+```
+
+- 在这个commit里面修改了这个问题：https://github.com/cython/cython/commit/c90f1d8470f5c2321375521cf2affb28fb0e7610
+
 This repository contains code necessary for designing, evolving type systems, and training neural type systems. To read more about this technique and our results [see this blog post](https://blog.openai.com/discovering-types-for-entity-disambiguation/) or [read the paper](https://arxiv.org/abs/1802.01021).
 
 Authors: Jonathan Raiman & Olivier Raiman
 
 Our latest approach to learning symbolic structures from data allows us to discover a set of task specific constraints on a neural network in the form of a type system, to guide its understanding of documents, and obtain state of the art accuracy at [recognizing entities in natural language](https://en.wikipedia.org/wiki/Entity_linking). Recognizing entities in documents can be quite challenging since there are often millions of possible answers. However, when using a type system to constrain the options to only those that semantically "type check," we shrink the answer set and make the problem dramatically easier to solve. Our new results suggest that learning types is a very strong signal for understanding natural language: if types were given to us by an oracle, we find that it is possible to obtain accuracies of 98.6-99% on two benchmark tasks [CoNLL (YAGO)](https://www.mpi-inf.mpg.de/departments/databases-and-information-systems/research/yago-naga/aida/) and the [TAC KBP 2010 challenge](https://pdfs.semanticscholar.org/b7fb/11ef06b0dcdc89ef0a5507c6c9ccea4206d8.pdf).
 
-### Data collection
+### Data collection 数据收集
 
-Get wikiarticle -> wikidata mapping (all languages) + Get anchor tags, redirections, category links, statistics (per language). To store all wikidata ids, their key properties (`instance of`, `part of`, etc..), and
-a mapping from all wikipedia article names to a wikidata id do as follows,
-along with wikipedia anchor tags and links, in three languages: English (en), French (fr), and Spanish (es):
+Get wikiarticle -> wikidata mapping (all languages) + Get anchor tags, redirections, category links, statistics (per language). To store all wikidata ids, their key properties (`instance of`, `part of`, etc..), and a mapping from all wikipedia article names to a wikidata id do as follows, along with wikipedia anchor tags and links, in three languages: English (en), French (fr), and Spanish (es):
 
 ```
 export DATA_DIR=data/
