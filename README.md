@@ -3,9 +3,23 @@
 DeepType: Multilingual Entity Linking through Neural Type System Evolution
 --------------------------------------------------------------------------
 
-需要先做后面的install部分，Cython版本不能过高，`pip install Cython==0.27.2 --install-option="--no-cython-compile"`
+## 版本说明
+
+用python3.6！！！！！！！不要用python3.7！！！！！！Cython用0.26！！！！！！！
+
+python3.6和cython0.26啥事没有……
+
+---
+
+关于cython版本：
+
+Cython版本不能过高，`pip install Cython==0.26 --install-option="--no-cython-compile"`
 
 - 相关issue：https://github.com/openai/deeptype/issues/38
+
+---
+
+关于Python3.7：
 
 旧版本的Cython和高版本的python3放在一起会有问题，因为Python3.7里面会有await关键字，但是旧版本Cython里面用了await作为变量名……所以不用0.26版本的cython
 
@@ -24,6 +38,33 @@ SyntaxError: invalid syntax
 ```
 
 - 在这个commit里面修改了这个问题：https://github.com/cython/cython/commit/c90f1d8470f5c2321375521cf2affb28fb0e7610
+- 但是如果用python3.7和cython0.27.2还是有问题：
+
+```
+    /tmp/pip-req-build-utup_f30/src/cython/wikidata_linker_utils/successor_mask.cpp:44733:13: error: ‘PyThreadState {aka struct _ts
+}’ has no member named ‘exc_type’; did you mean ‘curexc_type’?                                                                     
+         tstate->exc_type = *type;                                                                                                 
+                 ^~~~~~~~
+                 curexc_type
+    /tmp/pip-req-build-utup_f30/src/cython/wikidata_linker_utils/successor_mask.cpp:44734:13: error: ‘PyThreadState {aka struct _t$
+}’ has no member named ‘exc_value’; did you mean ‘curexc_value’?
+         tstate->exc_value = *value;
+                 ^~~~~~~~~
+                 curexc_value
+    /tmp/pip-req-build-utup_f30/src/cython/wikidata_linker_utils/successor_mask.cpp:44735:13: error: ‘PyThreadState {aka struct _t$
+}’ has no member named ‘exc_traceback’; did you mean ‘curexc_traceback’?
+         tstate->exc_traceback = *tb;
+                 ^~~~~~~~~~~~~
+                 curexc_traceback
+    At global scope:
+    cc1plus: warning: unrecognized command line option ‘-Wno-undefined-bool-conversion’
+    cc1plus: warning: unrecognized command line option ‘-Wno-unused-local-typedef’
+    error: command 'gcc' failed with exit status 1
+```
+
+---
+
+## 原文
 
 This repository contains code necessary for designing, evolving type systems, and training neural type systems. To read more about this technique and our results [see this blog post](https://blog.openai.com/discovering-types-for-entity-disambiguation/) or [read the paper](https://arxiv.org/abs/1802.01021).
 
@@ -37,7 +78,7 @@ Get wikiarticle -> wikidata mapping (all languages) + Get anchor tags, redirecti
 
 ```
 export DATA_DIR=data/
-./extraction/full_preprocess.sh ${DATA_DIR} en fr es
+bash ./extraction/full_preprocess.sh ${DATA_DIR} en fr es
 ```
 
 ### Create a type system manually and check oracle accuracy:
